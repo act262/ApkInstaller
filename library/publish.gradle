@@ -1,0 +1,162 @@
+apply plugin: 'maven-publish'
+
+def RELEASEURL = 'http://maven.paic.com.cn/repository/maven-public/'
+def SNAPSHOTSURL = 'http://maven.paic.com.cn/repository/maven-public/'
+
+def NEXUS_USERNAME = project.hasProperty('nexus_user') ? nexus_user : ''
+def NEXUS_PASSWORD = project.hasProperty('nexus_password') ? nexus_password : ''
+
+def auth = { PasswordCredentials credentials ->
+    credentials.username = NEXUS_USERNAME
+    credentials.password = NEXUS_PASSWORD
+}
+
+def DEFAULT_GROUP = 'com.paic.mo'
+
+def artifactName = project.hasProperty('artifactName') ? artifactName : project.name
+def artifactGroup = project.hasProperty("artifactGroup") ? artifactGroup : project.group
+def artifactVersion = project.hasProperty('artifactVersion') ? artifactVersion : project.version
+
+def archiveSource = project.hasProperty('archiveSource') ? archiveSource : false
+def description = project.hasProperty('artifactDesc') ? artifactDesc : ''
+
+def debugBundle = project.hasProperty('debugBundle') ? debugBundle : false
+
+publishing {
+    publications {
+        if (project.plugins.hasPlugin('com.android.application')) {
+            // android application module
+//            throw new GradleException('NOT allow apply to application module')
+            return
+        }
+
+        if (project.plugins.hasPlugin('com.android.library')) {
+            // android library module
+            aar(MavenPublication) {
+                artifactId artifactName
+                groupId artifactGroup
+                version artifactVersion
+
+                if (debugBundle) {
+                    // using debug
+                    artifact bundleDebugAar
+                } else {
+                    // using release
+                    artifact bundleDebugAar
+                }
+
+                if (archiveSource) {
+                    artifact archiveAndroid
+                }
+
+                // 需要手动添加依赖节点
+                pom.withXml {
+                    asNode().appendNode('description', description)
+
+                    // ref https://stackoverflow.com/a/42160584/4604713
+                    def dependenciesNode = asNode().appendNode('dependencies')
+                    def addDependency = { Dependency dep, String scope ->
+                        if (dep.group == null || dep.version == null || dep.name == null || dep.name == "unspecified")
+                            return // ignore invalid dependencies
+
+                        def dependencyNode = dependenciesNode.appendNode('dependency')
+
+                        dependencyNode.appendNode('groupId', dep.group)
+                        dependencyNode.appendNode('artifactId', dep.name)
+                        dependencyNode.appendNode('version', dep.version)
+                        dependencyNode.appendNode('scope', scope)
+                        // artifact
+                        dep.artifacts.each {
+                            dependencyNode.appendNode("classifier", it.classifier)
+                            dependencyNode.appendNode("type", it.type)
+                        }
+
+                        if (!dep.transitive) {
+                            // If this dependency is transitive, we should force exclude all its dependencies them from the POM
+                            def exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                            exclusionNode.appendNode('groupId', '*')
+                            exclusionNode.appendNode('artifactId', '*')
+                        } else if (!dep.properties.excludeRules.empty) {
+                            // Otherwise add specified exclude rules
+                            def exclusionNode = dependencyNode.appendNode('exclusions').appendNode('exclusion')
+                            dep.properties.excludeRules.each { ExcludeRule rule ->
+                                exclusionNode.appendNode('groupId', rule.group ?: '*')
+                                exclusionNode.appendNode('artifactId', rule.module ?: '*')
+                            }
+                        }
+                    }
+
+                    try {
+                        // List all "compile" dependencies (for old Gradle)
+                        configurations.compile.getAllDependencies().each { dep -> addDependency(dep, "compile") }
+                    } catch (Exception ignored) {
+                    }
+
+                    try {
+                        // List all "api" dependencies (for new Gradle) as "compile" dependencies
+                        configurations.api.getAllDependencies().each { dep -> addDependency(dep, "compile") }
+                        // List all "implementation" dependencies (for new Gradle) as "runtime" dependencies
+                        configurations.implementation.getAllDependencies().each { dep -> addDependency(dep, "runtime") }
+                    } catch (Exception ignored) {
+                    }
+                }
+            }
+        } else {
+            // java module
+            jar(MavenPublication) {
+                artifactId artifactName
+                groupId artifactGroup
+                version artifactVersion
+
+                from components.java
+
+                if (archiveSource) {
+                    artifact archiveJava
+                }
+
+                pom.withXml {
+                    asNode().appendNode('description', description)
+                }
+            }
+        }
+    }
+
+    repositories {
+        maven {
+            name 'release'
+            url RELEASEURL
+            credentials auth
+        }
+
+        maven {
+            name 'snapshots'
+            url SNAPSHOTSURL
+            credentials auth
+        }
+    }
+}
+
+task archiveJava(
+        type: Jar,
+        group: PublishingPlugin.PUBLISH_TASK_GROUP,
+        description: 'Archive source into jar',
+        overwrite: true) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+    extension = 'jar'
+}
+
+task archiveAndroid(
+        type: Jar,
+        group: PublishingPlugin.PUBLISH_TASK_GROUP,
+        description: 'Archive source into jar',
+        overwrite: true) {
+    from android.sourceSets.main.java.srcDirs
+    classifier = 'sources'
+    extension = 'jar'
+}
+
+// test
+artifacts {
+    archives archiveAndroid
+}
