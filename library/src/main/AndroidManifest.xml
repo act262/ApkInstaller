@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.zcx.sai">
+    package="io.zcx.apk">
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -9,7 +9,7 @@
 
     <application>
         <service
-            android:name=".InstallApkService"
+            android:name="io.zcx.apk.InstallApkService"
             android:enabled="true"
             android:exported="false" />
     </application>

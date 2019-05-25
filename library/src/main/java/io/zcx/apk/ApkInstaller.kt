@@ -1,4 +1,4 @@
-package io.zcx.sai
+package io.zcx.apk
 
 import android.app.PendingIntent
 import android.content.ComponentName
