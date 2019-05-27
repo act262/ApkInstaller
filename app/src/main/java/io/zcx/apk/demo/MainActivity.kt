@@ -8,14 +8,15 @@ import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v7.app.AppCompatActivity
 import android.view.View
-import android.view.ViewGroup
-import android.widget.Button
 import io.zcx.apk.ApkInstaller
 import io.zcx.apk.InstallParams
 import io.zcx.apk.InstallerCallback
-import org.jetbrains.anko.*
+import kotlinx.android.synthetic.main.activity_main.*
+import org.jetbrains.anko.alert
 import org.jetbrains.anko.appcompat.v7.Appcompat
-import org.jetbrains.anko.sdk27.coroutines.onClick
+import org.jetbrains.anko.noButton
+import org.jetbrains.anko.toast
+import org.jetbrains.anko.yesButton
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -25,71 +26,37 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         println("  $classLoader")
-
-
-        try {
-            val clazz = Class.forName("io.zcx.apk.dynamic_feature1.Feature1Activity")
-            val button = Button(this)
-            button.text = "feature1"
-            button.onClick {
-                alert(Appcompat, "Loaded feature1 apk", "Hi there") {
-                    yesButton {
-                        toast("Oh…")
-                        startActivity(Intent(this@MainActivity, clazz))
-                    }
-                    noButton {}
-                }.show()
-            }
-            addContentView(button, ViewGroup.LayoutParams(-2, -2))
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
-
-        try {
-            val clazz = Class.forName("io.zcx.apk.dynamic_feature2.Feature2Activity")
-
-            frameLayout {
-                button("Feature1") {
-                    onClick {
-                        startActivity(Intent(this@MainActivity, clazz))
-                    }
-                }
-            }
-        } catch (e: Exception) {
-        }
     }
 
-
     fun installApk(view: View) {
-
+        var dontKillApp = cb_dont_kill_app.isChecked
         when (view.id) {
             R.id.btn_install_all -> {
                 val apks = setOf(
-                    File("/sdcard", "dynamic_feature1-debug.apk"),
-                    File("/sdcard", "dynamic_feature2-debug.apk")
+                        File("/sdcard", "dynamic_feature1-debug.apk"),
+                        File("/sdcard", "dynamic_feature2-debug.apk")
                 )
 
-                installApk(apks)
+                installApk(apks, dontKillApp)
             }
 
             R.id.btn_install_feature1 -> {
-                installApk(setOf(File("/sdcard/dynamic_feature1-debug.apk")))
+                installApk(setOf(File("/sdcard/dynamic_feature1-debug.apk")), dontKillApp)
             }
 
             R.id.btn_install_feature2 -> {
-                installApk(setOf(File("/sdcard/dynamic_feature2-debug.apk")))
+                installApk(setOf(File("/sdcard/dynamic_feature2-debug.apk")), dontKillApp)
             }
         }
     }
 
-    private fun installApk(apks: Set<File>) {
+    private fun installApk(apks: Set<File>, dontKillApp: Boolean) {
         // Check storage permission
         val re = checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (re == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(
-                this,
-                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 10
+                    this,
+                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 10
             )
 
             return
@@ -122,25 +89,51 @@ class MainActivity : AppCompatActivity() {
 
         val apkInstaller = ApkInstaller(this)
         apkInstaller.install(
-            InstallParams()
-                .setDontKillApp(true)
-                .allowTestOnly(true)
-                .setInstallApks(apks),
-            object : InstallerCallback {
-                override fun onSuccess(p0: Bundle?) {
-                    toast("Install succeed")
-                }
+                InstallParams()
+                        .setDontKillApp(dontKillApp)
+                        .allowTestOnly(true)
+                        .setInstallApks(apks),
+                object : InstallerCallback {
+                    override fun onSuccess(p0: Bundle?) {
+                        toast("Install succeed")
+                    }
 
-                override fun onFailure(p0: Bundle?) {
-                    toast("Install failure")
-                }
+                    override fun onFailure(p0: Bundle?) {
+                        toast("Install failure")
+                    }
 
-                override fun onPending(p0: Bundle?) {
-                }
+                    override fun onPending(p0: Bundle?) {
+                    }
 
-                override fun onAborted(p0: Bundle?) {
-                    toast("Install aborted")
-                }
-            })
+                    override fun onAborted(p0: Bundle?) {
+                        toast("Install aborted")
+                    }
+                })
     }
+
+    fun goFeature1(view: View) {
+        try {
+            val clazz = Class.forName("io.zcx.apk.dynamic_feature1.Feature1Activity")
+
+            alert(Appcompat, "Loaded feature1 apk", "Hi there") {
+                yesButton {
+                    toast("Oh…")
+                    startActivity(Intent(this@MainActivity, clazz))
+                }
+                noButton {}
+            }.show()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
+
+    fun goFeature2(view: View) {
+        try {
+            val clazz = Class.forName("io.zcx.apk.dynamic_feature2.Feature2Activity")
+
+            startActivity(Intent(this@MainActivity, clazz))
+        } catch (e: Exception) {
+        }
+    }
+
 }

@@ -3,28 +3,58 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <Button
-        android:id="@+id/btn_install_all"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="installApk"
-        android:text="Install All apk" />
+        android:layout_height="wrap_content">
 
-    <Button
-        android:id="@+id/btn_install_feature1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="installApk"
-        android:text="Install Feature1" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="goFeature1"
+            android:text="@string/title_dynamic_feature1" />
 
-    <Button
-        android:id="@+id/btn_install_feature2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:onClick="installApk"
-        android:text="Install Feature2" />
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="goFeature2"
+            android:text="@string/title_dynamic_feature2" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_install_all"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="installApk"
+            android:text="Install All apk" />
+
+        <Button
+            android:id="@+id/btn_install_feature1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="installApk"
+            android:text="Install Feature1" />
+
+        <Button
+            android:id="@+id/btn_install_feature2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:onClick="installApk"
+            android:text="Install Feature2" />
+
+        <CheckBox
+            android:id="@+id/cb_dont_kill_app"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="don't kill app" />
+    </LinearLayout>
 </LinearLayout>
