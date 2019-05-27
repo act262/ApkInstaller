@@ -120,26 +120,27 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        ApkInstaller().install(
-            this,
-            InstallParams()
-                .setDontKillApp(true)
-                .allowTestOnly(true)
-                .setInstallApks(apks), object : InstallerCallback {
-                override fun onSuccess(p0: Bundle?) {
-                    toast("Install succeed")
-                }
+        ApkInstaller(this)
+            .install(
+                InstallParams()
+                    .setDontKillApp(true)
+                    .allowTestOnly(true)
+                    .setInstallApks(apks),
+                object : InstallerCallback {
+                    override fun onSuccess(p0: Bundle?) {
+                        toast("Install succeed")
+                    }
 
-                override fun onFailure(p0: Bundle?) {
-                    toast("Install failure")
-                }
+                    override fun onFailure(p0: Bundle?) {
+                        toast("Install failure")
+                    }
 
-                override fun onPending(p0: Bundle?) {
-                }
+                    override fun onPending(p0: Bundle?) {
+                    }
 
-                override fun onAborted(p0: Bundle?) {
-                    toast("Install aborted")
-                }
-            })
+                    override fun onAborted(p0: Bundle?) {
+                        toast("Install aborted")
+                    }
+                })
     }
 }
