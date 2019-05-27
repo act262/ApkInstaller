@@ -5,7 +5,7 @@ publish {
     repoName = 'maven'
     groupId = 'io.zcx.apk'
     artifactId = 'ApkInstaller'
-    publishVersion = '0.0.1'
+    publishVersion = '0.0.2'
     desc = 'Install apk'
     website = 'https://github.com/act262/ApkInstaller'
 }

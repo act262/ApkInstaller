@@ -27,3 +27,15 @@ allprojects {
 task clean(type: Delete) {
     delete rootProject.buildDir
 }
+
+
+project(':app') {
+    afterEvaluate {
+        configurations.implementation {
+            resolutionStrategy.dependencySubstitution {
+                // Just for local develop
+                substitute module('io.zcx.apk:ApkInstaller') with project(':library')
+            }
+        }
+    }
+}
