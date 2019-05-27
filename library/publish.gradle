@@ -1,7 +1,8 @@
 apply plugin: 'com.novoda.bintray-release'
 
 publish {
-    userOrg = 'zcx'
+    userOrg = 'act262'
+    repoName = 'maven'
     groupId = 'io.zcx.apk'
     artifactId = 'ApkInstaller'
     publishVersion = '0.0.1'

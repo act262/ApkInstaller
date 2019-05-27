@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">ApkInstaller</string>
+    <string name="title_dynamic_feature1">Feature1</string>
+    <string name="title_dynamic_feature2">Feature2</string>
 </resources>
