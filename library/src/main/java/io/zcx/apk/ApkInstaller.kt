@@ -37,32 +37,34 @@ class ApkInstaller {
             Log.e(TAG, "Install apk list is empty, no need install.")
             return
         }
+        context.bindService(
+            Intent(context, InstallApkService::class.java), object : ServiceConnection {
+                override fun onServiceDisconnected(name: ComponentName?) {
 
-        context.bindService(Intent(context, InstallApkService::class.java), object : ServiceConnection {
-            override fun onServiceDisconnected(name: ComponentName?) {
+                }
 
-            }
+                override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
+                    (service as InstallApkService.MyBinder).bindCallback(object : InstallerCallback {
+                        override fun onSuccess(bundle: Bundle?) {
+                            installerCallback?.onSuccess(bundle)
+                        }
 
-            override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
-                (service as InstallApkService.MyBinder).bindCallback(object : InstallerCallback {
-                    override fun onSuccess(bundle: Bundle?) {
-                        installerCallback?.onSuccess(bundle)
-                    }
+                        override fun onFailure(bundle: Bundle?) {
+                            installerCallback?.onFailure(bundle)
+                        }
 
-                    override fun onFailure(bundle: Bundle?) {
-                        installerCallback?.onFailure(bundle)
-                    }
+                        override fun onPending(bundle: Bundle?) {
+                            installerCallback?.onPending(bundle)
+                        }
 
-                    override fun onPending(bundle: Bundle?) {
-                        installerCallback?.onPending(bundle)
-                    }
-
-                    override fun onAborted(bundle: Bundle?) {
-                        installerCallback?.onAborted(bundle)
-                    }
-                })
-            }
-        }, Context.BIND_AUTO_CREATE)
+                        override fun onAborted(bundle: Bundle?) {
+                            installerCallback?.onAborted(bundle)
+                        }
+                    })
+                }
+            },
+            Context.BIND_AUTO_CREATE
+        )
 
         thread(true) {
             Log.d(TAG, "Verified...")
@@ -100,6 +102,12 @@ class ApkInstaller {
             method.invoke(sessionParams, true)
         }
 
+        // install allow testOnly
+        val installFlagsField = sessionParams.javaClass.getField("installFlags")
+        var installFlags = installFlagsField.getInt(sessionParams)
+        installFlags = installFlags.or(INSTALL_ALLOW_TEST)
+        installFlagsField.setInt(sessionParams, installFlags)
+
         val sessionId = installer.createSession(sessionParams)
         return sessionId
     }
@@ -127,4 +135,12 @@ class ApkInstaller {
         session.close()
     }
 
+
+    companion object {
+        /**
+         * @see PackageInstaller
+         * @see PackageManager#INSTALL_ALLOW_TEST
+         */
+        private const val INSTALL_ALLOW_TEST = 0x00000004
+    }
 }

@@ -66,8 +66,8 @@ class MainActivity : AppCompatActivity() {
         when (view.id) {
             R.id.btn_install_all -> {
                 val apks = setOf(
-                        File("/sdcard", "dynamic_feature1-debug.apk"),
-                        File("/sdcard", "dynamic_feature2-debug.apk")
+                    File("/sdcard", "dynamic_feature1-debug.apk"),
+                    File("/sdcard", "dynamic_feature2-debug.apk")
                 )
 
                 installApk(apks)
@@ -88,8 +88,8 @@ class MainActivity : AppCompatActivity() {
         val re = checkCallingOrSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (re == PackageManager.PERMISSION_DENIED) {
             ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 10
+                this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE), 10
             )
 
             return
@@ -121,24 +121,25 @@ class MainActivity : AppCompatActivity() {
         })
 
         ApkInstaller().install(
-                this,
-                InstallParams()
-                        .setDontKillApp(true)
-                        .setInstallApks(apks), object : InstallerCallback {
-            override fun onSuccess(p0: Bundle?) {
-                toast("Install succeed")
-            }
+            this,
+            InstallParams()
+                .setDontKillApp(true)
+                .allowTestOnly(true)
+                .setInstallApks(apks), object : InstallerCallback {
+                override fun onSuccess(p0: Bundle?) {
+                    toast("Install succeed")
+                }
 
-            override fun onFailure(p0: Bundle?) {
-                toast("Install failure")
-            }
+                override fun onFailure(p0: Bundle?) {
+                    toast("Install failure")
+                }
 
-            override fun onPending(p0: Bundle?) {
-            }
+                override fun onPending(p0: Bundle?) {
+                }
 
-            override fun onAborted(p0: Bundle?) {
-                toast("Install aborted")
-            }
-        })
+                override fun onAborted(p0: Bundle?) {
+                    toast("Install aborted")
+                }
+            })
     }
 }

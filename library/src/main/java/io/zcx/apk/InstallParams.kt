@@ -9,6 +9,8 @@ class InstallParams {
 
     var dontKillApp = false
 
+    var allowTestOnly = false
+
     var replaceExist = false
 
     var installDir: File? = null
@@ -17,6 +19,11 @@ class InstallParams {
 
     fun setDontKillApp(dontKillApp: Boolean): InstallParams {
         this.dontKillApp = dontKillApp
+        return this
+    }
+
+    fun allowTestOnly(allowTestOnly: Boolean): InstallParams {
+        this.allowTestOnly = allowTestOnly
         return this
     }
 
