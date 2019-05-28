@@ -38,3 +38,10 @@ dependencies {
 
     implementation 'io.zcx.apk:ApkInstaller:0.0.3'
 }
+
+// Just for local develop
+configurations.all {
+    resolutionStrategy.dependencySubstitution {
+        substitute module('io.zcx.apk:ApkInstaller') with project(':library')
+    }
+}
