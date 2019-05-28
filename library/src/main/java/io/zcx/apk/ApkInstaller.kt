@@ -53,19 +53,19 @@ class ApkInstaller(context: Context) {
 
             override fun onServiceConnected(name: ComponentName?, service: IBinder?) {
                 (service as InstallApkService.MyBinder).bindCallback(object : InstallerCallback {
-                    override fun onSuccess(bundle: Bundle?) {
+                    override fun onSuccess(bundle: Bundle) {
                         installerCallback?.onSuccess(bundle)
                     }
 
-                    override fun onFailure(bundle: Bundle?) {
+                    override fun onFailure(bundle: Bundle) {
                         installerCallback?.onFailure(bundle)
                     }
 
-                    override fun onPending(bundle: Bundle?) {
+                    override fun onPending(bundle: Bundle) {
                         installerCallback?.onPending(bundle)
                     }
 
-                    override fun onAborted(bundle: Bundle?) {
+                    override fun onAborted(bundle: Bundle) {
                         installerCallback?.onAborted(bundle)
                     }
                 })

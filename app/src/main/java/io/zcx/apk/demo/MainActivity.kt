@@ -94,18 +94,18 @@ class MainActivity : AppCompatActivity() {
                         .allowTestOnly(true)
                         .setInstallApks(apks),
                 object : InstallerCallback {
-                    override fun onSuccess(p0: Bundle?) {
+                    override fun onSuccess(bundle: Bundle) {
                         toast("Install succeed")
                     }
 
-                    override fun onFailure(p0: Bundle?) {
+                    override fun onFailure(bundle: Bundle) {
                         toast("Install failure")
                     }
 
-                    override fun onPending(p0: Bundle?) {
+                    override fun onPending(bundle: Bundle) {
                     }
 
-                    override fun onAborted(p0: Bundle?) {
+                    override fun onAborted(bundle: Bundle) {
                         toast("Install aborted")
                     }
                 })

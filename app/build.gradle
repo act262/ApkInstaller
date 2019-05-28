@@ -36,5 +36,5 @@ dependencies {
         exclude group: 'com.android.support'
     }
 
-    implementation 'io.zcx.apk:ApkInstaller:0.0.2'
+    implementation 'io.zcx.apk:ApkInstaller:0.0.3'
 }
